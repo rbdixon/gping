@@ -5,6 +5,7 @@ gping changelog
 In progress
 ===========
 - Prepare version 0.2
+- Be graceful to hostname resolution failures
 
 2012-08-21 0.0
 ==============

@@ -117,9 +117,6 @@ class GPing:
         while len(self.pings) >= self.max_outstanding:
             gevent.sleep()
 
-        #resolve hostnames
-        dest_addr  =  socket.gethostbyname(dest_addr)
-
         # figure out our id
         packet_id = self.id
 
@@ -129,6 +126,16 @@ class GPing:
 
         # make a spot for this ping in self.pings
         self.pings[packet_id] = {'sent':False,'success':False,'error':False,'dest_addr':dest_addr,'callback':callback}
+
+        # Resolve hostname
+        try:
+            dest_ip  =  socket.gethostbyname(dest_addr)
+            self.pings[packet_id]['dest_ip'] = dest_ip
+        except socket.gaierror as ex:
+            self.pings[packet_id]['error'] = True
+            self.pings[packet_id]['message'] = str(ex)
+            return
+
 
         # Remove header size from packet size
         psize = psize - 8
@@ -155,7 +162,7 @@ class GPing:
         self.pings[packet_id]['send_time'] = time.time()
 
         # send the packet
-        self.socket.sendto(packet, (dest_addr, 1)) # Don't know about the 1
+        self.socket.sendto(packet, (dest_ip, 1)) # Don't know about the 1
 
         #mark the packet as sent
         self.pings[packet_id]['sent'] = True
@@ -167,11 +174,18 @@ class GPing:
         """
         while not self.die_event.is_set():
             for i in self.pings:
+
+                # Detect timeout
                 if self.pings[i]['sent'] and time.time() - self.pings[i]['send_time'] > self.timeout:
                     self.pings[i]['error'] = True
+                    self.pings[i]['message'] = 'Timeout after {} seconds'.format(self.timeout)
+
+                # Handle all failures
+                if self.pings[i]['error'] == True:
                     self.pings[i]['callback'](self.pings[i])
                     del(self.pings[i])
                     break
+
             gevent.sleep()
 
 
