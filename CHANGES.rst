@@ -6,8 +6,12 @@ In progress
 ===========
 - Prepare version 0.2
 - Be graceful to hostname resolution failures
+- Record all failures (hostname resolution and timeouts) in ``self.failures``
 - Improve console output formatting
-- Add entrypoint ``gping`` and argument parsing
+- Add shell command entrypoint ``gping`` to ``setup.py``
+- Add argument parsing for interactive use, e.g. ``--hostnames=www.example.net,mail.example.net``
+- Incorporate "Make it possible to ping without root access" using ``socket.SOCK_DGRAM`` instead of ``socket.SOCK_RAW``
+  by Marko Tibold: https://github.com/markotibold/gping/commit/b75fa2d4
 
 2012-08-21 0.0
 ==============
