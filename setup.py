@@ -41,6 +41,13 @@ setup(
     url='https://github.com/mastahyeti/gping',
     keywords="ping icmp network latency gevent",
     py_modules=['gping'],
-    requires=['gevent'],
-    install_requires=['gevent']
+    install_requires=['gevent', 'args'],
+    dependency_links=[
+        'https://github.com/kennethreitz/args/tarball/0a6d5eb#egg=args',
+    ],
+    entry_points={
+        'console_scripts': [
+            'gping = gping:run',
+        ],
+    },
 )

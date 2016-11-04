@@ -7,6 +7,7 @@ In progress
 - Prepare version 0.2
 - Be graceful to hostname resolution failures
 - Improve console output formatting
+- Add entrypoint ``gping`` and argument parsing
 
 2012-08-21 0.0
 ==============

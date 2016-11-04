@@ -7,6 +7,7 @@ import os
 import struct
 import sys
 import time
+from args import args
 
 import gevent
 from gevent import socket
@@ -247,15 +248,36 @@ class GPing:
             print >>sys.stderr, message
 
 
-if __name__ == '__main__':
-    top_100_domains = ['google.com','facebook.com','youtube.com','yahoo.com','baidu.com','wikipedia.org','live.com','qq.com','twitter.com','amazon.com','linkedin.com','blogspot.com','google.co.in','taobao.com','sina.com.cn','yahoo.co.jp','msn.com','google.com.hk','wordpress.com','google.de','google.co.jp','google.co.uk','ebay.com','yandex.ru','163.com','google.fr','weibo.com','googleusercontent.com','bing.com','microsoft.com','google.com.br','babylon.com','soso.com','apple.com','mail.ru','t.co','tumblr.com','vk.com','google.ru','sohu.com','google.es','pinterest.com','google.it','craigslist.org','bbc.co.uk','livejasmin.com','tudou.com','paypal.com','blogger.com','xhamster.com','ask.com','youku.com','fc2.com','google.com.mx','xvideos.com','google.ca','imdb.com','flickr.com','go.com','tmall.com','avg.com','ifeng.com','hao123.com','zedo.com','conduit.com','google.co.id','pornhub.com','adobe.com','blogspot.in','odnoklassniki.ru','google.com.tr','cnn.com','aol.com','360buy.com','google.com.au','rakuten.co.jp','about.com','mediafire.com','alibaba.com','ebay.de','espn.go.com','wordpress.org','chinaz.com','google.pl','stackoverflow.com','netflix.com','ebay.co.uk','uol.com.br','amazon.de','ameblo.jp','adf.ly','godaddy.com','huffingtonpost.com','amazon.co.jp','cnet.com','globo.com','youporn.com','4shared.com','thepiratebay.se','renren.com']
+def ping(hostnames):
     gp = GPing()
 
     template = '{ip:20s}{delay:15s}{hostname:40s}{message}'
     header = template.format(hostname='Hostname', ip='IP', delay='Delay', message='Message')
     print >>sys.stderr, header
 
-    for domain in top_100_domains:
-        gp.send(domain,test_callback)
+    for hostname in hostnames:
+        gp.send(hostname, test_callback)
     gp.join()
     gp.print_failures()
+
+def run():
+
+    """
+    print 'Arguments passed in: ' + str(args.all)
+    print 'Flags detected: ' + str(args.flags)
+    print 'Files detected: ' + str(args.files)
+    print 'NOT files detected: ' + str(args.not_files)
+    print 'Grouped Arguments: ' + str(args.grouped)
+    print 'Assignments detected: ' + str(args.assignments)
+    """
+
+    if '--hostnames' in args.assignments:
+        hostnames_raw = args.assignments['--hostnames'].get(0)
+        hostnames = hostnames_raw.split(',')
+        ping(hostnames)
+
+
+if __name__ == '__main__':
+    top_100_domains = ['google.com','facebook.com','youtube.com','yahoo.com','baidu.com','wikipedia.org','live.com','qq.com','twitter.com','amazon.com','linkedin.com','blogspot.com','google.co.in','taobao.com','sina.com.cn','yahoo.co.jp','msn.com','google.com.hk','wordpress.com','google.de','google.co.jp','google.co.uk','ebay.com','yandex.ru','163.com','google.fr','weibo.com','googleusercontent.com','bing.com','microsoft.com','google.com.br','babylon.com','soso.com','apple.com','mail.ru','t.co','tumblr.com','vk.com','google.ru','sohu.com','google.es','pinterest.com','google.it','craigslist.org','bbc.co.uk','livejasmin.com','tudou.com','paypal.com','blogger.com','xhamster.com','ask.com','youku.com','fc2.com','google.com.mx','xvideos.com','google.ca','imdb.com','flickr.com','go.com','tmall.com','avg.com','ifeng.com','hao123.com','zedo.com','conduit.com','google.co.id','pornhub.com','adobe.com','blogspot.in','odnoklassniki.ru','google.com.tr','cnn.com','aol.com','360buy.com','google.com.au','rakuten.co.jp','about.com','mediafire.com','alibaba.com','ebay.de','espn.go.com','wordpress.org','chinaz.com','google.pl','stackoverflow.com','netflix.com','ebay.co.uk','uol.com.br','amazon.de','ameblo.jp','adf.ly','godaddy.com','huffingtonpost.com','amazon.co.jp','cnet.com','globo.com','youporn.com','4shared.com','thepiratebay.se','renren.com']
+    ping(top_100_domains)
+

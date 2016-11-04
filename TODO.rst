@@ -4,7 +4,8 @@ gping todo
 
 Tasks
 =====
-- [o] Add entrypoint ``gping`` and argument parsing
+- [x] Add entrypoint ``gping`` and argument parsing
+- [o] Add reading from stdin
 
 Upstream changes
 ================
