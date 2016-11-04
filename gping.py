@@ -1,5 +1,5 @@
 """
-    This part is a fork of the python-ping project that makes 
+    This part is a fork of the python-ping project that makes
     things work with gevent.
 """
 
@@ -162,8 +162,8 @@ class GPing:
 
 
     def __process_timeouts__(self):
-        """ 
-        check to see if any of our pings have timed out 
+        """
+        check to see if any of our pings have timed out
         """
         while not self.die_event.is_set():
             for i in self.pings:
@@ -176,8 +176,8 @@ class GPing:
 
 
     def __receive__(self):
-        """ 
-        receive response packets 
+        """
+        receive response packets
         """
         while not self.die_event.is_set():
             # wait till we can recv
@@ -197,7 +197,7 @@ class GPing:
             type, code, checksum, packet_id, sequence = struct.unpack(
                 "bbHHh", icmpHeader
             )
-            
+
             if packet_id in self.pings:
                 bytes_received = struct.calcsize("d")
                 time_sent = struct.unpack("d", received_packet[28:28 + bytes_received])[0]
