@@ -5,3 +5,5 @@
 /build
 .pydevproject
 /.settings
+/.venv*
+/.idea
