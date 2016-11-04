@@ -44,7 +44,15 @@ def checksum(source_string):
     return answer
 
 def test_callback(ping):
-    print ping
+    template = '{ip:20s}{delay:15s}{hostname:40s}{message}'
+    message = template.format(
+        hostname = ping['dest_addr'],
+        ip       = ping['dest_ip'],
+        delay    = ping['success'] and str(round(ping['delay'], 6)) or '',
+        message  = 'message' in ping and ping['message'] or ''
+    )
+    message = message.strip()
+    print >>sys.stderr, message
 
 
 class GPing:
@@ -67,13 +75,16 @@ class GPing:
         # object to hold and keep track of all of our self.pings
         self.pings = {}
 
+        # Hold failures
+        self.failures = []
+
         # event to file when we want to shut down
         self.die_event = Event()
 
         # setup socket
         icmp = socket.getprotobyname("icmp")
         try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp)
         except socket.error, (errno, msg):
             if errno == 1:
                 # Operation not permitted
@@ -125,7 +136,7 @@ class GPing:
 
 
         # make a spot for this ping in self.pings
-        self.pings[packet_id] = {'sent':False,'success':False,'error':False,'dest_addr':dest_addr,'callback':callback}
+        self.pings[packet_id] = {'sent':False,'success':False,'error':False,'dest_addr':dest_addr,'dest_ip':None,'callback':callback}
 
         # Resolve hostname
         try:
@@ -183,6 +194,7 @@ class GPing:
                 # Handle all failures
                 if self.pings[i]['error'] == True:
                     self.pings[i]['callback'](self.pings[i])
+                    self.failures.append(self.pings[i])
                     del(self.pings[i])
                     break
 
@@ -226,11 +238,24 @@ class GPing:
                 # delete the ping
                 del(self.pings[packet_id])
 
+    def print_failures(self):
+        print >>sys.stderr
+        print >>sys.stderr, 'Failures:'
+        template = '{hostname:45}{message}'
+        for failure in self.failures:
+            message = template.format(hostname=failure['dest_addr'], message='message' in failure and failure['message'])
+            print >>sys.stderr, message
 
 
 if __name__ == '__main__':
     top_100_domains = ['google.com','facebook.com','youtube.com','yahoo.com','baidu.com','wikipedia.org','live.com','qq.com','twitter.com','amazon.com','linkedin.com','blogspot.com','google.co.in','taobao.com','sina.com.cn','yahoo.co.jp','msn.com','google.com.hk','wordpress.com','google.de','google.co.jp','google.co.uk','ebay.com','yandex.ru','163.com','google.fr','weibo.com','googleusercontent.com','bing.com','microsoft.com','google.com.br','babylon.com','soso.com','apple.com','mail.ru','t.co','tumblr.com','vk.com','google.ru','sohu.com','google.es','pinterest.com','google.it','craigslist.org','bbc.co.uk','livejasmin.com','tudou.com','paypal.com','blogger.com','xhamster.com','ask.com','youku.com','fc2.com','google.com.mx','xvideos.com','google.ca','imdb.com','flickr.com','go.com','tmall.com','avg.com','ifeng.com','hao123.com','zedo.com','conduit.com','google.co.id','pornhub.com','adobe.com','blogspot.in','odnoklassniki.ru','google.com.tr','cnn.com','aol.com','360buy.com','google.com.au','rakuten.co.jp','about.com','mediafire.com','alibaba.com','ebay.de','espn.go.com','wordpress.org','chinaz.com','google.pl','stackoverflow.com','netflix.com','ebay.co.uk','uol.com.br','amazon.de','ameblo.jp','adf.ly','godaddy.com','huffingtonpost.com','amazon.co.jp','cnet.com','globo.com','youporn.com','4shared.com','thepiratebay.se','renren.com']
     gp = GPing()
+
+    template = '{ip:20s}{delay:15s}{hostname:40s}{message}'
+    header = template.format(hostname='Hostname', ip='IP', delay='Delay', message='Message')
+    print >>sys.stderr, header
+
     for domain in top_100_domains:
         gp.send(domain,test_callback)
     gp.join()
+    gp.print_failures()
