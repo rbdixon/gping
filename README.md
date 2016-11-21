@@ -36,7 +36,7 @@ This *should* be easy on your average \*nix box, just type:
 ### From GitHub ###
 This way of installing gping is suitable for hacking on it:
 
-    git clone https://github.com/zerotired/gping.git
+    git clone https://github.com/mastahyeti/gping.git
     cd gping
     virtualenv .venv27
     source .venv27/bin/activate

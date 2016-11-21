@@ -141,7 +141,7 @@ class GPing:
 
         # Resolve hostname
         try:
-            dest_ip  =  socket.gethostbyname(dest_addr)
+            dest_ip = socket.gethostbyname(dest_addr)
             self.pings[packet_id]['dest_ip'] = dest_ip
         except socket.gaierror as ex:
             self.pings[packet_id]['error'] = True
@@ -244,7 +244,7 @@ class GPing:
         print >>sys.stderr, 'Failures:'
         template = '{hostname:45}{message}'
         for failure in self.failures:
-            message = template.format(hostname=failure['dest_addr'], message='message' in failure and failure['message'])
+            message = template.format(hostname=failure['dest_addr'], message=failure.get('message', 'unknown error'))
             print >>sys.stderr, message
 
 
