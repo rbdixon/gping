@@ -33,7 +33,7 @@ def get_authors():
 
 setup(
     name='gping',
-    version="0.1",
+    version="0.2dev1",
     description='A gevent fork of python-ping.',
     author=get_authors(),
     maintainer="Ben Toews",
@@ -41,6 +41,13 @@ setup(
     url='https://github.com/mastahyeti/gping',
     keywords="ping icmp network latency gevent",
     py_modules=['gping'],
-    requires=['gevent'],
-    install_requires=['gevent']
+    install_requires=['gevent', 'args'],
+    dependency_links=[
+        'https://github.com/kennethreitz/args/tarball/0a6d5eb#egg=args',
+    ],
+    entry_points={
+        'console_scripts': [
+            'gping = gping:run',
+        ],
+    },
 )
