@@ -7,7 +7,6 @@ import os
 import struct
 import sys
 import time
-from args import args
 
 import gevent
 from gevent import socket
@@ -25,7 +24,7 @@ def checksum(source_string):
     """
     sum = 0
     count_to = (len(source_string) / 2) * 2
-    for count in xrange(0, count_to, 2):
+    for count in range(0, count_to, 2):
         this = ord(source_string[count + 1]) * 256 + ord(source_string[count])
         sum = sum + this
         sum = sum & 0xffffffff # Necessary?
@@ -53,7 +52,7 @@ def test_callback(ping):
         message  = 'message' in ping and ping['message'] or ''
     )
     message = message.strip()
-    print >>sys.stderr, message
+    print(message, file=sys.stderr)
 
 
 class GPing:
@@ -86,7 +85,8 @@ class GPing:
         icmp = socket.getprotobyname("icmp")
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp)
-        except socket.error, (errno, msg):
+        except socket.error as xxx_todo_changeme1:
+            (errno, msg) = xxx_todo_changeme1.args
             if errno == 1:
                 # Operation not permitted
                 msg = msg + (
@@ -104,7 +104,7 @@ class GPing:
         """
         try to shut everything down gracefully
         """
-        print "shutting down"
+        print("shutting down")
         self.die_event.set()
         socket.cancel_wait()
         gevent.joinall([self.receive_glet,self.processto_glet])
@@ -210,12 +210,13 @@ class GPing:
             # wait till we can recv
             try:
                 socket.wait_read(self.socket.fileno())
-            except socket.error, (errno,msg):
+            except socket.error as xxx_todo_changeme:
+                (errno,msg) = xxx_todo_changeme.args
                 if errno == socket.EBADF:
-                    print "interrupting wait_read"
+                    print("interrupting wait_read")
                     return
                 # reraise original exceptions
-                print "re-throwing socket exception on wait_read()"
+                print("re-throwing socket exception on wait_read()")
                 raise
 
             time_received = time.time()
@@ -240,12 +241,12 @@ class GPing:
                 del(self.pings[packet_id])
 
     def print_failures(self):
-        print >>sys.stderr
-        print >>sys.stderr, 'Failures:'
+        print(file=sys.stderr)
+        print('Failures:', file=sys.stderr)
         template = '{hostname:45}{message}'
         for failure in self.failures:
             message = template.format(hostname=failure['dest_addr'], message=failure.get('message', 'unknown error'))
-            print >>sys.stderr, message
+            print(message, file=sys.stderr)
 
 
 def ping(hostnames):
@@ -253,28 +254,28 @@ def ping(hostnames):
 
     template = '{ip:20s}{delay:15s}{hostname:40s}{message}'
     header = template.format(hostname='Hostname', ip='IP', delay='Delay', message='Message')
-    print >>sys.stderr, header
+    print(header, file=sys.stderr)
 
     for hostname in hostnames:
         gp.send(hostname, test_callback)
     gp.join()
     gp.print_failures()
 
-def run():
+# def run():
 
-    """
-    print 'Arguments passed in: ' + str(args.all)
-    print 'Flags detected: ' + str(args.flags)
-    print 'Files detected: ' + str(args.files)
-    print 'NOT files detected: ' + str(args.not_files)
-    print 'Grouped Arguments: ' + str(args.grouped)
-    print 'Assignments detected: ' + str(args.assignments)
-    """
+#     """
+#     print 'Arguments passed in: ' + str(args.all)
+#     print 'Flags detected: ' + str(args.flags)
+#     print 'Files detected: ' + str(args.files)
+#     print 'NOT files detected: ' + str(args.not_files)
+#     print 'Grouped Arguments: ' + str(args.grouped)
+#     print 'Assignments detected: ' + str(args.assignments)
+#     """
 
-    if '--hostnames' in args.assignments:
-        hostnames_raw = args.assignments['--hostnames'].get(0)
-        hostnames = hostnames_raw.split(',')
-        ping(hostnames)
+#     if '--hostnames' in args.assignments:
+#         hostnames_raw = args.assignments['--hostnames'].get(0)
+#         hostnames = hostnames_raw.split(',')
+#         ping(hostnames)
 
 
 if __name__ == '__main__':

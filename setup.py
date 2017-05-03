@@ -26,7 +26,7 @@ def get_authors():
             authors.append(line.strip(" *\r\n"))
         f.close()
         authors.sort()
-    except Exception, err:
+    except Exception as err:
         authors = "[Error: %s]" % err
     return authors
 
@@ -41,7 +41,7 @@ setup(
     url='https://github.com/mastahyeti/gping',
     keywords="ping icmp network latency gevent",
     py_modules=['gping'],
-    install_requires=['gevent', 'args'],
+    install_requires=['gevent'],
     dependency_links=[
         'https://github.com/kennethreitz/args/tarball/0a6d5eb#egg=args',
     ],
