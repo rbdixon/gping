@@ -23,9 +23,9 @@ def checksum(source_string):
     to suggest that it gives the same answers as in_cksum in ping.c
     """
     sum = 0
-    count_to = (len(source_string) / 2) * 2
+    count_to = int((len(source_string) / 2) * 2)
     for count in range(0, count_to, 2):
-        this = ord(source_string[count + 1]) * 256 + ord(source_string[count])
+        this = source_string[count + 1] * 256 + source_string[count]
         sum = sum + this
         sum = sum & 0xffffffff # Necessary?
 
@@ -159,7 +159,7 @@ class GPing:
         header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, my_checksum, packet_id, 1)
         bytes = struct.calcsize("d")
         data = (psize - bytes) * "Q"
-        data = struct.pack("d", time.time()) + data
+        data = struct.pack("d", time.time()) + data.encode()
 
         # Calculate the checksum on the data and the dummy header.
         my_checksum = checksum(header + data)
